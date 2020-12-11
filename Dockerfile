@@ -1,10 +1,10 @@
 FROM python:3.8
 
-ARG APP_DIR=/app/todo_list
+ARG APP_DIR=/app/todo_list/
 
 WORKDIR ${APP_DIR}
 
-COPY requirements/base.txt requirements/prod.txt .
+COPY requirements/base.txt requirements/prod.txt ${APP_DIR}
 RUN pip install -r prod.txt && rm base.txt prod.txt
 EXPOSE 8000
 
@@ -13,7 +13,4 @@ RUN chown -R todo_list:todo_list ${APP_DIR}
 USER todo_list
 COPY src .
 
-CMD ["gunicorn todo_list.wsgi -b :8000 -w 4"]
-
-
-
+CMD ["gunicorn", "todo_list.wsgi", "-b", ":8000", "-w", "4"]
