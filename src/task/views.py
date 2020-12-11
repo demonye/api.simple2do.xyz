@@ -12,10 +12,10 @@ class TodoTaskView(mixins.ListModelMixin,
                    viewsets.GenericViewSet):
     """TaskAPIView. """
 
-    queryset = TodoTask.objects.all()
+    queryset = TodoTask.objects.filter(is_archived=False)
     serializer_class = TodoTaskSerialier
 
     def destroy(self, request, pk):
         if self.get_object().is_archived:
             raise exceptions.NotFound
-        super().destroy(pk)
+        return super().destroy(request, pk)
