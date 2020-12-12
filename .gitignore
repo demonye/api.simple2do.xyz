@@ -49,3 +49,5 @@ docs/_build/
 
 db.sqlite3
 .vscode/
+
+.env
