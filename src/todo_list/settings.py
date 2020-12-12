@@ -31,13 +31,14 @@ env = environ.Env(
     TODO_DB_PASSWORD=(str, 'password'),
     TODO_DB_PORT=(int, 3306),
     TODO_DB_CONN_MAX_AGE=(int, 28800),
+    ALLOWED_HOSTS=(list, [])
 )
 environ.Env.read_env()
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env('ALLOWED_HOSTS')
 
 
 # Application definition
