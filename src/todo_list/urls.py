@@ -13,10 +13,22 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+import os
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.http import HttpResponse
+
+
+def version(request):
+    version = ''
+    with open(os.path.join(settings.BASE_DIR, '..', 'VERSION')) as fp:
+        version = fp.read().strip()
+    return HttpResponse(version)
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/task/', include('task.urls')),
+    path('api/v1/version/', version),
 ]
