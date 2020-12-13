@@ -51,3 +51,6 @@ db.sqlite3
 .vscode/
 
 .env
+api.sock
+nginx/data
+src/todo_list/.env

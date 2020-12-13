@@ -6,7 +6,6 @@ WORKDIR ${APP_DIR}
 
 COPY requirements/base.txt requirements/prod.txt ${APP_DIR}
 RUN pip install -r prod.txt && rm base.txt prod.txt
-EXPOSE 8000
 
 RUN groupadd -r todo_list && useradd -u 1000 --no-log-init -r -g todo_list todo_list
 RUN chown -R todo_list:todo_list ${APP_DIR}
