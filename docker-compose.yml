@@ -1,0 +1,38 @@
+version: '3.8'
+services:
+  web:
+    hostname: web
+    image: 031158229003.dkr.ecr.ap-southeast-2.amazonaws.com/simple2do.xyz:latest
+    links:
+      - redis:redis
+    env_file: .simple2do/env_file
+    command: gunicorn todo_list.wsgi -w 2 -b unix:/tmp/socket/api.sock -t 300
+    volumes:
+      - nginx_socket:/tmp/socket/
+
+  redis:
+    hostname: redis
+    image: redis:latest
+
+  nginx:
+    hostname: nginx
+    image: nginx:alpine
+    volumes:
+      - nginx_socket:/tmp/socket/
+      - .simple2do/nginx/conf.d:/etc/nginx/conf.d
+      - .simple2do/nginx/data/certbot/conf:/etc/letsencrypt
+      - .simple2do/nginx/data/certbot/www:/var/www/certbot
+    ports:
+      - "80:80"
+      - "443:443"
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - .simple2do/nginx/data/certbot/conf:/etc/letsencrypt
+      - .simple2do/nginx/data/certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+volumes:
+  nginx_socket:

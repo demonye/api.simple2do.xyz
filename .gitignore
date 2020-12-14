@@ -52,4 +52,4 @@ db.sqlite3
 
 api.sock
 nginx/data
-src/todo_list/.env
+env_file
