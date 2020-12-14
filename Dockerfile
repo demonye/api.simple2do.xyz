@@ -12,4 +12,4 @@ RUN chown -R todo_list:todo_list ${APP_DIR}
 USER todo_list
 COPY src .
 
-CMD ["gunicorn", "todo_list.wsgi", "-b", ":8000", "-w", "4"]
+CMD ["gunicorn", "todo_list.wsgi", "-b", ":8000", "-w", "2"]
