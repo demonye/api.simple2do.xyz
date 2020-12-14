@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 import os
 import sys
 import environ
+import boto3
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -32,6 +33,7 @@ env = environ.Env(
     TODO_DB_PASSWORD=(str, 'password'),
     TODO_DB_PORT=(int, 3306),
     TODO_DB_CONN_MAX_AGE=(int, 28800),
+    TODO_SCM_SECRET_ID=(str, None),
     ALLOWED_HOSTS=(list, [])
 )
 environ.Env.read_env()
@@ -88,18 +90,43 @@ WSGI_APPLICATION = 'todo_list.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'HOST': env('TODO_DB_HOST'),
-        'NAME': env('TODO_DB_NAME'),
-        'USER': env('TODO_DB_USER'),
-        'PASSWORD': env('TODO_DB_PASSWORD'),
-        'PORT': env('TODO_DB_PORT'),
-        'CONN_MAX_AGE': env('TODO_DB_CONN_MAX_AGE'),
-        "OPTIONS": { "charset": "utf8mb4" },
+if env('TODO_SCM_SECRET_ID'):
+    import json
+    import base64
+
+    session = boto3.session.Session()
+    scm = session.client('secretsmanager')
+    secret = scm.get_secret_value(SecretId=env('TODO_SCM_SECRET_ID'))
+    if 'SecretString' in secret:
+        secret_string = secret['SecretString']
+    else:
+        secret_string = base64.b64decode(serect['SecretBinary'])
+    db = json.loads(secret_string)
+    DATABASES = {
+        'default': {
+            'ENGINE': f'django.db.backends.{db["engine"]}',
+            'HOST': db['host'],
+            'NAME': env('TODO_DB_NAME'),
+            'USER': db['username'],
+            'PASSWORD': db['password'],
+            'PORT': db['port'],
+            'CONN_MAX_AGE': env('TODO_DB_CONN_MAX_AGE'),
+            "OPTIONS": { "charset": "utf8mb4" },
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'HOST': env('TODO_DB_HOST'),
+            'NAME': env('TODO_DB_NAME'),
+            'USER': env('TODO_DB_USER'),
+            'PASSWORD': env('TODO_DB_PASSWORD'),
+            'PORT': env('TODO_DB_PORT'),
+            'CONN_MAX_AGE': env('TODO_DB_CONN_MAX_AGE'),
+            "OPTIONS": { "charset": "utf8mb4" },
+        }
+    }
 
 if 'test' in sys.argv:
     DATABASES['default'] = {'ENGINE': 'django.db.backends.sqlite3'}
