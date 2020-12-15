@@ -13,4 +13,4 @@ RUN pip install -r prod.txt && rm base.txt prod.txt
 
 COPY src .
 
-CMD ["gunicorn", "todo_list.wsgi", "-b", ":8000", "-w", "2"]
+CMD ["manage.py", "migrate", "&&", "manage.py", "runserver"]

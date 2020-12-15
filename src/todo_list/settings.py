@@ -90,7 +90,14 @@ WSGI_APPLICATION = 'todo_list.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
-if env('TODO_SCM_SECRET_ID'):
+if env('TODO_DB_ENGINE') == 'sqlite3':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': env('TODO_DB_NAME') or 'db.sqlite3'
+        }
+    }
+elif env('TODO_SCM_SECRET_ID'):
     import json
     import base64
 
